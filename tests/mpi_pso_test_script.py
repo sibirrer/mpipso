@@ -12,7 +12,7 @@ def lnprop(x):
 
 
 from mpipso.mpipso import MpiParticleSwarmOptimizer
-from mpipso.pso import ParticleSwarmOptimizer
+#from mpipso.pso import ParticleSwarmOptimizer
 
 #pool = MPIPool()
 #if not pool.is_master():
@@ -45,7 +45,7 @@ for swarm in pso.sample(n_iterations):
             print(num_iter)
 
 if pso.is_master():
-    #result = pso.mpiBCast(pso.gbest.position)
+    result = pso.mpiBCast(pso.gbest.position)
     time_end = time.time()
     print(time_end - time_start)
-    #print(result)
+    print(result)
