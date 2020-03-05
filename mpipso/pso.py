@@ -50,7 +50,6 @@ class ParticleSwarmOptimizer(object):
         self.particleCount = particleCount
         self.threads = threads
         self.pool = pool
-
         if self.threads > 1 and self.pool is None:
             self.pool = multiprocessing.Pool(self.threads)
 
@@ -96,7 +95,7 @@ class ParticleSwarmOptimizer(object):
                 return
 
             if (self._converged(i, p=p, m=m, n=n)):
-                if (self.isMaster()):
+                if self.is_master():
                     print("converged after %s iterations!" % i)
                     print("best fit found: ", self.gbest.fitness, self.gbest.position)
                 return
@@ -158,6 +157,7 @@ class ParticleSwarmOptimizer(object):
         lnprob = numpy.array([l[0] for l in results])
         for i, particle in enumerate(swarm):
             particle.fitness = lnprob[i]
+            particle.position = pos[i]
 
     def _converged(self, it, p, m, n):
         #        test = self._convergedSpace2(p=p)
@@ -198,9 +198,11 @@ class ParticleSwarmOptimizer(object):
         delta = numpy.mean((means - self.gbest.position) / self.gbest.position)
         return numpy.log10(delta) < -3.0
 
-    def isMaster(self):
+    def is_master(self):
         return True
 
+    def isMaster(self):
+        return self.is_master()
 
 class Particle(object):
     """
