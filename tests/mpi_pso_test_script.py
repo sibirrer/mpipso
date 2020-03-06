@@ -20,13 +20,13 @@ from mpipso.mpipso import MpiParticleSwarmOptimizer
 #    pool.wait()
 #    sys.exit(0)
 
-pso = MpiParticleSwarmOptimizer(func=lnprop, low=[-10], high=[10], particleCount=n_particle, threads=1)
+pso = MpiParticleSwarmOptimizer(func=lnprop, low=[-10], high=[10], particle_count=n_particle, threads=1)
 #pso = ParticleSwarmOptimizer(func=lnprop, low=[-10], high=[10], particleCount=n_particle, threads=1, pool=pool)
 
 init_pos = np.array([0])
-pso.gbest.position = init_pos
-pso.gbest.velocity = [0] * len(init_pos)
-pso.gbest.fitness, _ = lnprop(init_pos)
+pso.global_best.position = init_pos
+pso.global_best.velocity = [0] * len(init_pos)
+pso.global_best.fitness, _ = lnprop(init_pos)
 X2_list = []
 vel_list = []
 pos_list = []
@@ -36,16 +36,16 @@ if pso.is_master():
 num_iter = 0
 
 for swarm in pso.sample(n_iterations):
-    X2_list.append(pso.gbest.fitness * 2)
-    vel_list.append(pso.gbest.velocity)
-    pos_list.append(pso.gbest.position)
+    X2_list.append(pso.global_best.fitness * 2)
+    vel_list.append(pso.global_best.velocity)
+    pos_list.append(pso.global_best.position)
     num_iter += 1
     if pso.is_master():
         if num_iter % 10 == 0:
             print(num_iter)
 
 if pso.is_master():
-    result = pso.mpiBCast(pso.gbest.position)
+    result = pso.mpi_broadcast(pso.global_best.position)
     time_end = time.time()
     print(time_end - time_start)
     print(result)

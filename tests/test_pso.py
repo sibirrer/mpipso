@@ -30,7 +30,7 @@ class TestPSO(object):
         assert (particle.velocity == particle2.velocity).all()
 
         particle.fitness = 1
-        particle.updatePBest()
+        particle.update_personal_best()
 
         assert particle.pbest.fitness == 1
 
@@ -53,7 +53,7 @@ class TestPSO(object):
         fitness = [part.fitness == 0 for part in pso.swarm]
         assert all(fitness)
 
-        assert pso.gbest.fitness == -np.inf
+        assert pso.global_best.fitness == -np.inf
 
     def test_optimize(self):
         low = np.zeros(2)
@@ -71,7 +71,7 @@ class TestPSO(object):
         fitness = [part.fitness != 0 for part in pso.swarm]
         assert all(fitness)
 
-        assert pso.gbest.fitness != -np.inf
+        assert pso.global_best.fitness != -np.inf
 
     def test_sample(self):
 
@@ -83,12 +83,12 @@ class TestPSO(object):
             return - x ** 2, None
 
         from mpipso.pso import ParticleSwarmOptimizer
-        pso = ParticleSwarmOptimizer(func=lnprop, low=[-10], high=[10], particleCount=n_particle, threads=1)
+        pso = ParticleSwarmOptimizer(func=lnprop, low=[-10], high=[10], particle_count=n_particle, threads=1)
 
         init_pos = np.array([1])
-        pso.gbest.position = init_pos
-        pso.gbest.velocity = [0] * len(init_pos)
-        pso.gbest.fitness, _ = lnprop(init_pos)
+        pso.global_best.position = init_pos
+        pso.global_best.velocity = [0] * len(init_pos)
+        pso.global_best.fitness, _ = lnprop(init_pos)
         X2_list = []
         vel_list = []
         pos_list = []
@@ -97,15 +97,15 @@ class TestPSO(object):
             print('Computing the PSO...')
         num_iter = 0
         for swarm in pso.sample(n_iterations):
-            X2_list.append(pso.gbest.fitness * 2)
-            vel_list.append(pso.gbest.velocity)
-            pos_list.append(pso.gbest.position)
+            X2_list.append(pso.global_best.fitness * 2)
+            vel_list.append(pso.global_best.velocity)
+            pos_list.append(pso.global_best.position)
             num_iter += 1
             if pso.is_master():
                 if num_iter % 10 == 0:
                     print(num_iter)
 
-        result = pso.gbest.position
+        result = pso.global_best.position
 
         time_end = time.time()
         print(time_end - time_start)
