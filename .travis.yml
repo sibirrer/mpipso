@@ -32,7 +32,7 @@ matrix:
 
 
 before_install:
-  - sh ci/travis/install-mpi.sh $MPI
+  - sh install-mpi.sh $MPI
   - pip install coveralls
   - pip install tox-travis
 
@@ -40,7 +40,7 @@ before_install:
 install:
   - pip install -U pytest
   - pip install cython
-  - pip install mpi4py>=3.0.0 --ignore-installed
+  - pip install mpi4py>=3.0.0 --force-reinstall
   - pip install -r requirements.txt
   - pip install .
 
