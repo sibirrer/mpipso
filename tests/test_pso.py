@@ -5,20 +5,35 @@ Execute with py.test -v
 
 """
 import numpy as np
+import pytest
 import time
 import numpy.testing as npt
+
 from mpipso.pso import ParticleSwarmOptimizer
 from mpipso.pso import Particle
 
 
-class TestPSO(object):
+class TestParticleSwarmOptimizer(object):
+    """
+
+    """
     ctx = None
     params = np.array([[1, 2, 3], [4, 5, 6]])
 
-    def setup(self):
+    @classmethod
+    def setup_class(cls):
+        pass
+
+    @classmethod
+    def teardown_class(cls):
         pass
 
     def test_particle(self):
+        """
+
+        :return:
+        :rtype:
+        """
         particle = Particle.create(2)
         assert particle.fitness == -np.inf
 
@@ -36,6 +51,11 @@ class TestPSO(object):
         assert particle.personal_best.fitness == 1
 
     def test_setup(self):
+        """
+
+        :return:
+        :rtype:
+        """
         low = np.zeros(2)
         high = np.ones(2)
         pso = ParticleSwarmOptimizer(None, low, high, 10)
@@ -57,6 +77,11 @@ class TestPSO(object):
         assert pso.global_best.fitness == -np.inf
 
     def test_optimize(self):
+        """
+
+        :return:
+        :rtype:
+        """
         low = np.zeros(2)
         high = np.ones(2)
 
@@ -78,7 +103,11 @@ class TestPSO(object):
         assert pso.global_best.fitness != -np.inf
 
     def test_sample(self):
+        """
 
+        :return:
+        :rtype:
+        """
         np.random.seed(42)
         n_particle = 100
         n_iterations = 100
@@ -97,9 +126,12 @@ class TestPSO(object):
         vel_list = []
         pos_list = []
         time_start = time.time()
+
         if pso.is_master():
             print('Computing the PSO...')
+
         num_iter = 0
+
         for swarm in pso.sample(n_iterations):
             x2_list.append(pso.global_best.fitness * 2)
             vel_list.append(pso.global_best.velocity)
@@ -115,3 +147,7 @@ class TestPSO(object):
         print(time_end - time_start)
         print(result)
         npt.assert_almost_equal(result[0], 0, decimal=6)
+
+
+if __name__ == '__main__':
+    pytest.main()

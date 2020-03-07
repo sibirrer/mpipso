@@ -3,22 +3,56 @@
 """Tests for `mpipso` package."""
 
 import pytest
+import numpy as np
+from schwimmbad import MPIPool
+
+from mpipso.mpipso import MpiParticleSwarmOptimizer
 
 
-from mpipso import mpipso
-
-
-@pytest.fixture
-def response():
-    """Sample pytest fixture.
-
-    See more at: http://doc.pytest.org/en/latest/fixture.html
+class TestMpiParticleSwarmOptimizer(object):
     """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
+
+    """
+    @classmethod
+    def setup_class(cls):
+        pass
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def test_optimize(self):
+        """
+
+        :return:
+        :rtype:
+        """
+        try:
+            MPIPool()
+        except ValueError:
+            # MPI is not initiated, so skip test
+            pass
+        else:
+            low = np.zeros(2)
+            high = np.ones(2)
+
+            def func(p):
+                return -np.random.rand(), None
+
+            pso = MpiParticleSwarmOptimizer(func, low, high, 10)
+
+            max_iter = 10
+            swarms, global_bests = pso.optimize(max_iter)
+            assert swarms is not None
+            assert global_bests is not None
+            assert len(swarms) == max_iter
+            assert len(global_bests) == max_iter
+
+            fitness = [part.fitness != 0 for part in pso.swarm]
+            assert all(fitness)
+
+            assert pso.global_best.fitness != -np.inf
 
 
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
+if __name__ == '__main__':
+    pytest.main()
