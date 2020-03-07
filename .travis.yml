@@ -3,10 +3,10 @@
 language: python
 
 python:
-  - "3.8"
+  #- "3.8"
   - "3.7"
-  - "3.6"
-  - "3.5"
+  #- "3.6"
+  #- "3.5"
 
 os: linux
 dist: xenial
@@ -14,7 +14,7 @@ sudo: required
 
 env:
   global:
-    - TEST_CMD='py.test'
+    - TEST_CMD='tox'
     - MPI_TEST_CMD='python'
   matrix:
     - MPI=mpich
@@ -25,7 +25,7 @@ matrix:
     - python: 3.7
       env:
         - MPI=openmpi
-        - TEST_CMD='py.test --cov --cov-append'
+        - TEST_CMD='tox'
         # - MPI_TEST_CMD='coverage run -a' # if we can get coverage working...
         - MPI_TEST_CMD='python'
         - RUN_COVERAGE=true
@@ -45,15 +45,14 @@ install:
   - pip install .
 
 before_script:
-  - if [[ "$MPI" == "mpich" ]]; then P=2; else P=5; fi
+  - if [[ "$MPI" == "mpich" ]]; then P=2; else P=4; fi
 
 # command to run tests, e.g. python setup.py test
 script:
-  - mpiexec -n $P $MPI_TEST_CMD $PWD/tests/test_mpipso.py
+  #- mpiexec -n $P $MPI_TEST_CMD $PWD/tests/test_mpipso.py
   - $TEST_CMD
 
 after_success:
   - if [ "$RUN_COVERAGE" = true ] ; then
-        python -m coverage combine;
         coveralls;
     fi
