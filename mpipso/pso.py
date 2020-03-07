@@ -54,9 +54,9 @@ class ParticleSwarmOptimizer(object):
 
         if self.pool is None:
             if self.threads > 1:
-                self.pool = MultiPool
+                self.pool = MultiPool()
             else:
-                self.pool = SerialPool
+                self.pool = SerialPool()
 
         self.param_count = len(self.low)
 
@@ -95,7 +95,6 @@ class ParticleSwarmOptimizer(object):
         self._get_fitness(self.swarm)
         i = 0
         while True:
-
             for particle in self.swarm:
                 if self.global_best.fitness < particle.fitness:
                     self.global_best = particle.copy()
@@ -107,13 +106,13 @@ class ParticleSwarmOptimizer(object):
                     particle.update_personal_best()
 
             if i >= max_iter:
-                print("max iteration reached! stoping")
+                print("Max iteration reached! Stopping.")
                 return
 
             if self._converged(i, p=p, m=m, n=n):
                 if self.is_master():
-                    print("converged after %s iterations!" % i)
-                    print("best fit found: ", self.global_best.fitness,
+                    print("Converged after {} iterations!".format(i))
+                    print("Best fit found: ", self.global_best.fitness,
                           self.global_best.position)
                 return
 
@@ -163,23 +162,35 @@ class ParticleSwarmOptimizer(object):
         return swarms, global_bests
 
     def _get_fitness(self, swarm):
+        """
 
-        # If the `pool` property of the pso has been set (i.e. we want
-        # to use `multiprocessing`), use the `pool`'s map method. Otherwise,
-        # just use the built-in `map` function.
-        if self.pool is not None:
-            map_function = self.pool.map
-        else:
-            map_function = map
-
+        :param swarm:
+        :type swarm:
+        :return:
+        :rtype:
+        """
         position = np.array([part.position for part in swarm])
-        results = map_function(self.func, position)
+        results = self.pool.map(self.func, position)
         ln_probability = np.array([l[0] for l in results])
+
         for i, particle in enumerate(swarm):
             particle.fitness = ln_probability[i]
             particle.position = position[i]
 
     def _converged(self, it, p, m, n):
+        """
+
+        :param it:
+        :type it:
+        :param p:
+        :type p:
+        :param m:
+        :type m:
+        :param n:
+        :type n:
+        :return:
+        :rtype:
+        """
         #        test = self._converged_space2(p=p)
         #        print(test)
         fit = self._converged_fit(it=it, p=p, m=m)
@@ -251,7 +262,12 @@ class ParticleSwarmOptimizer(object):
         return np.log10(delta) < -3.0
 
     def is_master(self):
-        return True
+        """
+
+        :return:
+        :rtype:
+        """
+        return self.pool.is_master()
 
 
 class Particle(object):
@@ -263,7 +279,6 @@ class Particle(object):
     :param fitness: the current fitness of the particle
 
     """
-
     def __init__(self, position, velocity, fitness=0):
         self.position = position
         self.velocity = velocity

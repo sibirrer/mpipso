@@ -7,7 +7,8 @@ Execute with py.test -v
 import numpy as np
 import time
 import numpy.testing as npt
-from mpipso.pso import ParticleSwarmOptimizer, Particle
+from mpipso.pso import ParticleSwarmOptimizer
+from mpipso.pso import Particle
 
 
 class TestPSO(object):
@@ -17,22 +18,22 @@ class TestPSO(object):
     def setup(self):
         pass
 
-    def test_Particle(self):
+    def test_particle(self):
         particle = Particle.create(2)
         assert particle.fitness == -np.inf
 
-        assert particle == particle.pbest
+        assert particle == particle.personal_best
 
         particle2 = particle.copy()
         assert particle.fitness == particle2.fitness
-        assert particle.paramCount == particle2.paramCount
-        assert (particle.position == particle2.position).all()
-        assert (particle.velocity == particle2.velocity).all()
+        assert particle.param_count == particle2.param_count
+        assert np.all(particle.position == particle2.position)
+        assert np.all(particle.velocity == particle2.velocity)
 
         particle.fitness = 1
         particle.update_personal_best()
 
-        assert particle.pbest.fitness == 1
+        assert particle.personal_best.fitness == 1
 
     def test_setup(self):
         low = np.zeros(2)
@@ -58,15 +59,18 @@ class TestPSO(object):
     def test_optimize(self):
         low = np.zeros(2)
         high = np.ones(2)
-        func = lambda p: (-np.random.rand(), None)
+
+        def func(p):
+            return -np.random.rand(), None
+
         pso = ParticleSwarmOptimizer(func, low, high, 10)
 
-        maxIter = 10
-        swarms, gbests = pso.optimize(maxIter)
+        max_iter = 10
+        swarms, global_bests = pso.optimize(max_iter)
         assert swarms is not None
-        assert gbests is not None
-        assert len(swarms) == maxIter
-        assert len(gbests) == maxIter
+        assert global_bests is not None
+        assert len(swarms) == max_iter
+        assert len(global_bests) == max_iter
 
         fitness = [part.fitness != 0 for part in pso.swarm]
         assert all(fitness)
@@ -79,17 +83,17 @@ class TestPSO(object):
         n_particle = 100
         n_iterations = 100
 
-        def lnprop(x):
+        def ln_probability(x):
             return - x ** 2, None
 
-        from mpipso.pso import ParticleSwarmOptimizer
-        pso = ParticleSwarmOptimizer(func=lnprop, low=[-10], high=[10], particle_count=n_particle, threads=1)
+        pso = ParticleSwarmOptimizer(func=ln_probability, low=[-10], high=[10],
+                                     particle_count=n_particle, threads=1)
 
         init_pos = np.array([1])
         pso.global_best.position = init_pos
         pso.global_best.velocity = [0] * len(init_pos)
-        pso.global_best.fitness, _ = lnprop(init_pos)
-        X2_list = []
+        pso.global_best.fitness, _ = ln_probability(init_pos)
+        x2_list = []
         vel_list = []
         pos_list = []
         time_start = time.time()
@@ -97,7 +101,7 @@ class TestPSO(object):
             print('Computing the PSO...')
         num_iter = 0
         for swarm in pso.sample(n_iterations):
-            X2_list.append(pso.global_best.fitness * 2)
+            x2_list.append(pso.global_best.fitness * 2)
             vel_list.append(pso.global_best.velocity)
             pos_list.append(pso.global_best.position)
             num_iter += 1
