@@ -30,16 +30,16 @@ class MpiParticleSwarmOptimizer(ParticleSwarmOptimizer):
         """
         pool = MPIPool()
 
-        if not pool.is_master():
-            pool.wait()
-            sys.exit(0)
-
         super(MpiParticleSwarmOptimizer, self).__init__(
             func, low, high,
             particle_count=particle_count,
             threads=threads,
             pool=pool
         )
+
+        if not pool.is_master():
+            pool.wait()
+            sys.exit(0)
 
     # def _converged(self, it, p, m, n):
     #     #
