@@ -4,7 +4,7 @@ language: python
 
 python:
   #- "3.8"
-  - "3.7"
+  - "3.6"
   #- "3.6"
   #- "3.5"
 
@@ -22,7 +22,7 @@ env:
 
 matrix:
   include:
-    - python: 3.7
+    - python: 3.6
       env:
         - MPI=openmpi
         - TEST_CMD='tox'
@@ -40,7 +40,7 @@ before_install:
 install:
   - pip install -U pytest
   - pip install cython
-  - pip install mpi4py>=3.0.0
+  - pip install -U mpi4py
   - pip install -r requirements.txt
   - pip install .
 
