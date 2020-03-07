@@ -40,7 +40,7 @@ before_install:
 install:
   - pip install -U pytest
   - pip install cython
-  - sudo pip install -U mpi4py
+  - sudo python -m pip install -U mpi4py
   - pip install -r requirements.txt
   - pip install .
 
