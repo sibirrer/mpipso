@@ -4,7 +4,6 @@ language: python
 
 python:
   - "3.8"
-  - "3.7"
   - "3.6"
   - "3.5"
 
@@ -22,7 +21,7 @@ env:
 
 matrix:
   include:
-    - python: 3.6
+    - python: 3.7
       env:
         - MPI=openmpi
         - TEST_CMD='py.test --cov --cov-append'
@@ -38,10 +37,14 @@ before_install:
 
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
+  - pip install -U pytest
   - pip install cython
   - pip install mpi4py>=3.0.0
   - pip install -r requirements.txt
   - pip install .
+
+before_script:
+  - if [[ "$MPI" == "mpich" ]]; then P=2; else P=5; fi
 
 # command to run tests, e.g. python setup.py test
 script:
