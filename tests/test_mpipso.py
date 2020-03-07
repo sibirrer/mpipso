@@ -36,9 +36,6 @@ class TestMpiParticleSwarmOptimizer(object):
             low = np.zeros(2)
             high = np.ones(2)
 
-            def func(p):
-                return -np.random.rand(), None
-
             pso = MpiParticleSwarmOptimizer(func, low, high, 10)
 
             max_iter = 10
@@ -52,6 +49,15 @@ class TestMpiParticleSwarmOptimizer(object):
             assert all(fitness)
 
             assert pso.global_best.fitness != -np.inf
+
+
+def func(p):
+    """
+    Function used for testing.
+    :return:
+    :rtype:
+    """
+    return -np.random.rand(), None
 
 
 if __name__ == '__main__':
