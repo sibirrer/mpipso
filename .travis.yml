@@ -33,7 +33,6 @@ matrix:
 
 before_install:
   - sh ci/travis/install-mpi.sh $MPI
-  - pip install -U pip
   - pip install coveralls
   - pip install tox-travis
 
